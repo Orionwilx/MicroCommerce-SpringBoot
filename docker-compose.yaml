@@ -29,9 +29,32 @@ services:
     networks:
       - microservices-network
 
+  # PRODUCT MICROSERVICE
+  product-service:
+    build: ./product-service
+    ports:
+      - "8081:8081" #Debe exponerse tanto internamente como para el cliente en otro puerto supone que es porque utiliza una base de datos no relacional
+    environment:    #Pero no sabe si esa es la razon  ya que de esta forma fue que funciono
+      - SPRING_DATA_MONGODB_URI=mongodb://product-db:27017/productdb
+      - SERVER_PORT=8081
+    depends_on:
+      - product-db
+    networks:
+      - microservices-network
+
+  product-db:
+    image: mongo:6.0
+    ports:
+      - "27017:27017"
+    volumes:
+      - product-data:/data/db
+    networks:
+      - microservices-network
+
 networks:
   microservices-network:
     driver: bridge
 
 volumes:
   order-data:
+  product-data:
