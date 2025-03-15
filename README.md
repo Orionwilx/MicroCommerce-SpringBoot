@@ -5,7 +5,7 @@ E-commerce system based on microservices architecture built with Spring Boot. Th
 
 ## Architecture
 
-![Microservices Architecture](https://www.atlassian.com/es/microservices/microservices-architecture)
+![Microservices Architecture](https://www.hiberus.com/crecemos-contigo/wp-content/uploads/2019/03/microservicios-estructura-1024x550.png)
 
 ### Implemented Services:
 - **Product Service**: Manages product catalog (MongoDB)
@@ -95,7 +95,7 @@ Sistema de comercio electrónico basado en microservicios construido con Spring 
 
 ## Arquitectura
 
-![Arquitectura de Microservicios](https://www.atlassian.com/es/microservices/microservices-architecture)
+![Arquitectura de Microservicios](https://www.hiberus.com/crecemos-contigo/wp-content/uploads/2019/03/microservicios-estructura-1024x550.png)
 
 ### Servicios implementados:
 - **Product Service**: Gestiona el catálogo de productos (MongoDB)
