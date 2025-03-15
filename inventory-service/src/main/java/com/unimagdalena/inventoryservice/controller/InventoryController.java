@@ -4,6 +4,7 @@ import com.unimagdalena.inventoryservice.entity.Inventory;
 import com.unimagdalena.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -21,8 +22,10 @@ public class InventoryController {
     }
 
     @GetMapping("/{id}")
-    public Mono<Inventory> getInventoryItemById(@PathVariable String id) {
-        return inventoryService.getInventoryItemById(id);
+    public Mono<ResponseEntity<Inventory>> getInventoryItemById(@PathVariable String id) {
+        return inventoryService.getInventoryItemById(id)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -32,8 +35,10 @@ public class InventoryController {
     }
 
     @PutMapping("/{id}")
-    public Mono<Inventory> updateInventoryItem(@PathVariable String id, @RequestBody Inventory inventory) {
-        return inventoryService.updateInventoryItem(id, inventory);
+    public Mono<ResponseEntity<Inventory>> updateInventoryItem(@PathVariable String id, @RequestBody Inventory inventory) {
+        return inventoryService.updateInventoryItem(id, inventory)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
