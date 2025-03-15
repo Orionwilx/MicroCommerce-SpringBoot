@@ -5,7 +5,7 @@ E-commerce system based on microservices architecture built with Spring Boot. Th
 
 ## Architecture
 
-![Microservices Architecture](https://miro.medium.com/v2/resize:fit:1400/1*p2uc0h1kEBCCrBLlR6AMNw.png)
+![Microservices Architecture](https://www.atlassian.com/es/microservices/microservices-architecture)
 
 ### Implemented Services:
 - **Product Service**: Manages product catalog (MongoDB)
@@ -95,7 +95,7 @@ Sistema de comercio electrónico basado en microservicios construido con Spring 
 
 ## Arquitectura
 
-![Arquitectura de Microservicios](https://miro.medium.com/v2/resize:fit:1400/1*p2uc0h1kEBCCrBLlR6AMNw.png)
+![Arquitectura de Microservicios](https://www.atlassian.com/es/microservices/microservices-architecture)
 
 ### Servicios implementados:
 - **Product Service**: Gestiona el catálogo de productos (MongoDB)
