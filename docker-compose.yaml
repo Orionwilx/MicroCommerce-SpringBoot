@@ -11,10 +11,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SERVER_PORT=8080
+      - EUREKA_SERVER_URL:http://eureka-server:8761/eureka/
     depends_on:
       - order-db
     networks:
       - microservices-network
+    deploy:
+      replicas: 3
 
   order-db:
     image: postgres:15-alpine
@@ -37,10 +40,13 @@ services:
     environment:    #Pero no sabe si esa es la razon  ya que de esta forma fue que funciono
       - SPRING_DATA_MONGODB_URI=mongodb://product-db:27017/productdb
       - SERVER_PORT=8081
+      - EUREKA_SERVER_URL:http://eureka-server:8761/eureka/
     depends_on:
       - product-db
     networks:
       - microservices-network
+    deploy:
+      replicas: 3
 
   product-db:
     image: mongo:6.0
@@ -60,10 +66,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SERVER_PORT=8080
+      - EUREKA_SERVER_URL:http://eureka-server:8761/eureka/
     depends_on:
       - inventory-db
     networks:
       - microservices-network
+    deploy:
+      replicas: 3
 
   inventory-db:
     image: postgres:15-alpine
@@ -88,10 +97,13 @@ services:
       - SPRING_DATASOURCE_USERNAME=postgres
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SERVER_PORT=8080
+      - EUREKA_SERVER_URL:http://eureka-server:8761/eureka/
     depends_on:
       - payment-db
     networks:
       - microservices-network
+    deploy:
+      replicas: 3
 
   payment-db:
     image: postgres:15-alpine
@@ -103,6 +115,16 @@ services:
       - POSTGRES_DB=paymentdb
     volumes:
       - payment-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: eureka-server
+    ports:
+      - "8761:8761"
     networks:
       - microservices-network
 

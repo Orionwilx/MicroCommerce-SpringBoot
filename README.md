@@ -172,7 +172,7 @@ DELETE /api/inventory/{id}    - Eliminar producto en inventario
 - Agregar servicio de descubrimiento (Eureka)
 - Implementar Circuit Breaker con Resilience4j
 - Añadir autenticación/autorización con OAuth2/JWT
-- Implementar tests unitarios e integración
+- ~Implementar tests unitarios e integración~
 - Incorporar documentación de API con Swagger/OpenAPI
 - Configurar monitoreo con Spring Actuator y Prometheus
 
