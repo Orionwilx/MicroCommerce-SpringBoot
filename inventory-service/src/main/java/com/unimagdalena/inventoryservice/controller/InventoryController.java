@@ -17,10 +17,9 @@ public class InventoryController {
     private final InventoryService inventoryService;
 
     @GetMapping
-    public Flux<Inventory> getAllInventoryItems() {
-        return inventoryService.getAllInventoryItems();
+    public Mono<ResponseEntity<Flux<Inventory>>> getAllInventoryItems() {
+        return Mono.just(ResponseEntity.ok(inventoryService.getAllInventoryItems()));
     }
-
     @GetMapping("/{id}")
     public Mono<ResponseEntity<Inventory>> getInventoryItemById(@PathVariable String id) {
         return inventoryService.getInventoryItemById(id)
