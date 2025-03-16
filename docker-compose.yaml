@@ -117,7 +117,8 @@ services:
       - payment-data:/var/lib/postgresql/data
     networks:
       - microservices-network
-
+      -
+  # EUREKA SERVER
   eureka-server:
     build:
       context: ./eureka-server
@@ -127,6 +128,27 @@ services:
       - "8761:8761"
     networks:
       - microservices-network
+
+  # API GATEWAY
+  api-gateway:
+    build:
+      context: ./api-gateway
+      dockerfile: Dockerfile
+    ports:
+      - "8090:8090"
+    environment:
+      - SERVER_PORT=8090
+      - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+    depends_on:
+      - eureka-server
+      - order-service
+      - product-service
+      - inventory-service
+      - payment-service
+    networks:
+      - microservices-network
+    deploy:
+      replicas: 2
 
 networks:
   microservices-network:
