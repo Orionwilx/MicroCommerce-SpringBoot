@@ -87,7 +87,7 @@ DELETE /api/inventory/{id}    - Eliminar producto en inventario
 - Configure monitoring with Spring Actuator and Prometheus
 
  
-## Espanish version
+## Spanish version
 # Microservicio de Comercio Electrónico
 
 ## Descripción
