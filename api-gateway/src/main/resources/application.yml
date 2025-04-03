@@ -10,94 +10,20 @@ spring:
         locator:
           enabled: true
           lower-case-service-id: true
-      routes:
-        - id: order-service
-          uri: lb://order-service
-          predicates:
-            - Path=/api/orders/**
-        - id: product-service
-          uri: lb://product-service
-          predicates:
-            - Path=/api/products/**
-        - id: inventory-service
-          uri: lb://inventory-service
-          predicates:
-            - Path=/api/inventory/**
-        - id: payment-service
-          uri: lb://payment-service
-          predicates:
-            - Path=/api/payments/**
-        #/////////////////////////////////////////////////////////////
-        # 1. Predicado básico por ruta
-        - id: order-service
-          uri: lb://order-service
-          predicates:
-            - Path=/api/orders/**
-
-        # 2. Predicado por metodo HTTP
-        - id: product-admin
-          uri: lb://product-admin-service
-          predicates:
-            - Path=/api/products/**
-            - Method=POST,PUT,DELETE
-
-        # 3. Predicado por host
-        - id: product-region
-          uri: lb://product-colombia-service
-          predicates:
-            - Path=/api/products/**
-            - Host=*.colombia.unimagdalena.com
-
-        # 4. Predicado por cabeceras HTTP
-        - id: inventory-internal
-          uri: lb://inventory-admin-service
-          predicates:
-            - Path=/api/inventory/**
-            - Header=X-Role,ADMIN
-
-        # 5. Predicado por cookies
-        - id: payment-session
-          uri: lb://payment-service
-          predicates:
-            - Path=/api/payments/**
-            - Cookie=session-valid,true
-
-        # 6. Predicado por parámetros de consulta
-        - id: product-search
-          uri: lb://product-caribe-service
-          predicates:
-            - Path=/api/products/search
-            - Query=region,caribe
-
-        # 7. Predicado por tiempo
-        - id: promotions
-          uri: lb://promotion-service
-          predicates:
-            - Path=/api/promotions/**
-            - Between=2024-05-01T00:00:00-05:00,2024-12-31T23:59:59-05:00
-
-        # 8. Predicado por peso (pruebas A/B)
-        - id: payment-new
-          uri: lb://payment-new-service
-          predicates:
-            - Path=/api/payments/**
-            - Weight=payment-group,8
-        - id: payment-old
-          uri: lb://payment-old-service
-          predicates:
-            - Path=/api/payments/**
-            - Weight=payment-group,2
-
-        # 9. Predicado con reescritura de ruta
-        - id: api-legacy
-          uri: lb://legacy-service
-          predicates:
-            - Path=/legacy-api/**
-          filters:
-            - RewritePath=/legacy-api/(?<segment>.*), /api/v1/${segment}
+    httpclient:
+      connect-timeout: 2000
+      response-timeout: 5s
+      pool:
+        max-connections: 1000
+        acquire-timeout: 5000
+        max-idle-time: 15s
 eureka:
   client:
     serviceUrl:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     preferIpAddress: true
+logging:
+  level:
+    org.springframework.cloud.gateway: INFO
+    reactor.netty: INFO
