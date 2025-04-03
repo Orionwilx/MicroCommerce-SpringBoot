@@ -1,3 +1,5 @@
+package com.unimagdalena.apigateway.filter.global;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
@@ -12,9 +14,9 @@ import reactor.core.publisher.Mono;
 import java.util.UUID;
 
 @Component
-public class CorrelationIdFilter implements GlobalFilter, Ordered {
+public class correlationIdFIlter implements GlobalFilter, Ordered {
     
-    private static final Logger logger = LoggerFactory.getLogger(CorrelationIdFilter.class);
+    private static final Logger logger = LoggerFactory.getLogger(correlationIdFIlter.class);
     private static final String CORRELATION_ID_HEADER = "X-Correlation-Id";
 
     @Override
