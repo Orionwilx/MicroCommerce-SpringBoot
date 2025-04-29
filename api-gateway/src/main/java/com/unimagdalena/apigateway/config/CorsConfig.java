@@ -18,7 +18,6 @@ public class CorsConfig {
         corsConfig.setMaxAge(3600L);
         corsConfig.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
         corsConfig.setAllowedHeaders(Arrays.asList("*"));
-        corsConfig.setExposedHeaders(Arrays.asList("X-Correlation-Id")); // Exponer el header
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", corsConfig);

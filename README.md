@@ -186,6 +186,7 @@ DELETE /api/inventory/{id}    - Eliminar producto en inventario
 
 ```
 
+
 ## Servicios de infraestructura
 - **Eureka Server**: http://localhost:8761
 - **API Gateway**: http://localhost:8090
@@ -204,4 +205,7 @@ DELETE /api/inventory/{id}    - Eliminar producto en inventario
 - ~~Implementar tests unitarios e integración~~
 - Incorporar documentación de API con Swagger/OpenAPI
 - Configurar monitoreo con Spring Actuator y Prometheus
-```
+
+## Pendientes 
+ - Terminar integracion correcta de circuit breaker con resilience4j
+ - Agregar observabilidad con spring actuator
