@@ -17,6 +17,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -32,22 +33,44 @@ public class ProductCachingFilterFactory extends AbstractGatewayFilterFactory<Pr
         super(Config.class);
     }
 
+    public Map<String, Object> getCacheStats() {
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("cacheSize", cache.size());
+        stats.put("cachedEntries", cache.keySet());
+
+        // Contar entradas válidas e inválidas
+        long validEntries = cache.entrySet().stream()
+                .filter(entry -> !entry.getValue().isExpired())
+                .count();
+
+        stats.put("validEntries", validEntries);
+        stats.put("expiredEntries", cache.size() - validEntries);
+
+        return stats;
+    }
+
+    public void clearCache() {
+        cache.clear();
+        log.info("Cache limpiado manualmente");
+    }
+
     @Override
     public GatewayFilter apply(Config config) {
         return (exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             String path = request.getPath().value();
+            String clientIp = request.getRemoteAddress() != null ?
+                    request.getRemoteAddress().getAddress().getHostAddress() : "unknown";
 
-            // Solo aplicar caché a peticiones GET de productos específicos
             if (request.getMethod() == HttpMethod.GET && path.matches("/api/products/\\d+")) {
-
-                log.info("Procesando solicitud para posible caché: {}", path);
-
-                // Verificar si existe una entrada en caché válida
                 CacheEntry entry = cache.get(path);
                 if (entry != null && !entry.isExpired()) {
-                    log.info("Retornando respuesta desde caché para: {}", path);
+                    long ttlRemaining = (entry.expirationTime - System.currentTimeMillis()) / 1000;
+                    log.info("🎯 CACHE HIT: {} | Cliente: {} | TTL restante: {}s",
+                            path, clientIp, ttlRemaining);
                     return entry.applyCachedResponse(exchange);
+                } else {
+                    log.info("❌ CACHE MISS: {} | Cliente: {} | Cargando desde servicio", path, clientIp);
                 }
 
                 // No existe caché, capturar la respuesta
@@ -74,6 +97,7 @@ public class ProductCachingFilterFactory extends AbstractGatewayFilterFactory<Pr
 
                                         // Guardar en caché
                                         HttpHeaders headers = new HttpHeaders();
+                                        headers.add("X-Cache", "MISS");
                                         headers.addAll(getHeaders());
                                         cache.put(path, new CacheEntry(allBytes, headers,
                                                 TimeUnit.SECONDS.toMillis(config.getTtlSeconds())));
@@ -134,6 +158,10 @@ public class ProductCachingFilterFactory extends AbstractGatewayFilterFactory<Pr
         public Mono<Void> applyCachedResponse(ServerWebExchange exchange) {
             ServerHttpResponse response = exchange.getResponse();
             response.getHeaders().putAll(this.headers);
+
+            // Agregar encabezados indicativos del caché
+            response.getHeaders().add("X-Cache", "HIT");
+            response.getHeaders().add("X-Cache-Expires", String.valueOf(expirationTime));
 
             DataBuffer buffer = bufferFactory.wrap(this.body);
             return response.writeWith(Mono.just(buffer));
