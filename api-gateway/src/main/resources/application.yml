@@ -17,13 +17,19 @@ spring:
         max-connections: 1000
         acquire-timeout: 5000
         max-idle-time: 15s
+
+#EUREKA
 eureka:
   client:
     serviceUrl:
       defaultZone: http://eureka-server:8761/eureka/
   instance:
     preferIpAddress: true
+    
+#LOGGIN
 logging:
   level:
     org.springframework.cloud.gateway: INFO
     reactor.netty: INFO
+
+
