@@ -18,6 +18,7 @@ spring:
         acquire-timeout: 5000
         max-idle-time: 15s
 
+
 #EUREKA
 eureka:
   client:
@@ -33,3 +34,41 @@ logging:
     reactor.netty: INFO
 
 
+#ACTUATOR
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+  health:
+    circuitbreaker:
+      enabled: true
+
+#CIRCUIT BREAKER
+resilience4j:
+  circuitbreaker:
+    configs:
+      default:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 5              # Número de llamadas en la ventana de análisis
+        failureRateThreshold: 20           # Porcentaje de fallos para abrir el circuito (20% en 5 llamadas)
+        waitDurationInOpenState: 50s        # Tiempo que el circuito permanece abierto antes de pasar a medio-abierto
+        permittedNumberOfCallsInHalfOpenState: 2 # Número de llamadas permitidas en estado medio-abierto
+        automaticTransitionFromOpenToHalfOpenEnabled: true # Transición automática
+    instances:
+      productServiceCB:
+        baseConfig: default
+      inventoryServiceCB:
+        baseConfig: default
+      orderServiceCB:
+        baseConfig: default
+      paymentServiceCB:
+        baseConfig: default
+  timelimiter:
+    configs:
+      default:
+        timeoutDuration: 3s

@@ -147,7 +147,7 @@ services:
     networks:
       - microservices-network
     deploy:
-      replicas: 2
+      replicas: 1
 
 networks:
   microservices-network:
