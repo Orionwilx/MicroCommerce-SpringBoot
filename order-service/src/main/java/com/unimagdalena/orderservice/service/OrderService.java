@@ -1,8 +1,11 @@
 package com.unimagdalena.orderservice.service;
 
+import com.unimagdalena.orderservice.client.InventoryClient;
+import com.unimagdalena.orderservice.DTOs.InventoryUpdateRequest;
 import com.unimagdalena.orderservice.entity.Order;
 import com.unimagdalena.orderservice.respository.OrderRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,8 +15,10 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class OrderService {
     private final OrderRepository orderRepository;
+    private final InventoryClient inventoryClient;
 
     public Flux<Order> getAllOrders() {
         return Flux.defer(() -> Flux.fromIterable(orderRepository.findAll()))
@@ -25,7 +30,25 @@ public class OrderService {
     }
 
     public Mono<Order> createOrder(Order order){
-        return Mono.defer(() -> Mono.just(orderRepository.save(order)))
+        return Mono.defer(() -> {
+                    try {
+                        // Luego actualizamos el inventario
+                        InventoryUpdateRequest updateRequest = new InventoryUpdateRequest();
+                        updateRequest.setId(order.getId());
+                        updateRequest.setProductName(order.getProductName());
+                        updateRequest.setQuantityToDecrease(order.getQuantity());
+
+                        inventoryClient.updateInventory(updateRequest);
+                        log.info("Inventario actualizado correctamente para el producto: {}", order.getProductName());
+                    } catch (Exception e) {
+                        log.error("Error al actualizar el inventario: {}", e.getMessage());
+                        // Aquí podrías implementar un mecanismo de compensación o registrar el error
+                    }
+                    // Primero guardamos la orden
+                    Order savedOrder = orderRepository.save(order);
+
+                    return Mono.just(savedOrder);
+                })
                 .subscribeOn(Schedulers.boundedElastic());
     }
 

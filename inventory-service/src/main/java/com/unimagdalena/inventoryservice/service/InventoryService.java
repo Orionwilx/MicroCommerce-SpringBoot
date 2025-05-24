@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
+import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -49,5 +50,25 @@ public class InventoryService {
         }).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
+    public Mono<Inventory> getInventoryByProductName(String productName) {
+        return Mono.defer(() -> Mono.justOrEmpty(inventoryRepository.findByProductName(productName)))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<Inventory> decreaseInventory(String productName, Integer quantityToDecrease) {
+        return Mono.defer(() -> {
+            Inventory inventory = inventoryRepository.findByProductName(productName);
+            if (inventory == null) {
+                throw new RuntimeException("Producto no encontrado en inventario: " + productName);
+            }
+
+            if (inventory.getQuantity() < quantityToDecrease) {
+                throw new RuntimeException("Inventario insuficiente para: " + productName);
+            }
+
+            inventory.setQuantity(inventory.getQuantity() - quantityToDecrease);
+            return Mono.just(inventoryRepository.save(inventory));
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
 
 }
