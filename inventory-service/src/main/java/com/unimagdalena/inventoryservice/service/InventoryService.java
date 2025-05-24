@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
-import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
@@ -28,7 +27,9 @@ public class InventoryService {
     }
 
     public Mono<Inventory> createInventoryItem(Inventory inventory) {
-        inventory.setId(UUID.randomUUID().toString());
+        if (inventory.getId() == null || inventory.getId().isEmpty()) {
+            inventory.setId(UUID.randomUUID().toString());
+        }
         return Mono.defer(() -> Mono.just(inventoryRepository.save(inventory)))
                 .subscribeOn(Schedulers.boundedElastic());
     }

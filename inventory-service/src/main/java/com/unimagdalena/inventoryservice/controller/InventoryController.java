@@ -1,6 +1,7 @@
 package com.unimagdalena.inventoryservice.controller;
 
 import com.unimagdalena.inventoryservice.dto.InventoryUpdateRequest;
+import com.unimagdalena.inventoryservice.dto.InventoryCreateRequest;
 import com.unimagdalena.inventoryservice.entity.Inventory;
 import com.unimagdalena.inventoryservice.service.InventoryService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,11 @@ public class InventoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Inventory> createInventoryItem(@RequestBody Inventory inventory) {
+    public Mono<Inventory> createInventoryItem(@RequestBody InventoryCreateRequest request) {
+        Inventory inventory = new Inventory();
+        inventory.setId(request.getProductId());
+        inventory.setProductName(request.getProductName());
+        inventory.setQuantity(request.getQuantity());
         return inventoryService.createInventoryItem(inventory);
     }
 
