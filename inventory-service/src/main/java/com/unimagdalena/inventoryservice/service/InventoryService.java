@@ -27,7 +27,9 @@ public class InventoryService {
     }
 
     public Mono<Inventory> createInventoryItem(Inventory inventory) {
-        inventory.setId(UUID.randomUUID().toString());
+        if (inventory.getId() == null || inventory.getId().isEmpty()) {
+            inventory.setId(UUID.randomUUID().toString());
+        }
         return Mono.defer(() -> Mono.just(inventoryRepository.save(inventory)))
                 .subscribeOn(Schedulers.boundedElastic());
     }
@@ -49,5 +51,25 @@ public class InventoryService {
         }).subscribeOn(Schedulers.boundedElastic()).then();
     }
 
+    public Mono<Inventory> getInventoryByProductName(String productName) {
+        return Mono.defer(() -> Mono.justOrEmpty(inventoryRepository.findByProductName(productName)))
+                .subscribeOn(Schedulers.boundedElastic());
+    }
+
+    public Mono<Inventory> decreaseInventory(String productName, Integer quantityToDecrease) {
+        return Mono.defer(() -> {
+            Inventory inventory = inventoryRepository.findByProductName(productName);
+            if (inventory == null) {
+                throw new RuntimeException("Producto no encontrado en inventario: " + productName);
+            }
+
+            if (inventory.getQuantity() < quantityToDecrease) {
+                throw new RuntimeException("Inventario insuficiente para: " + productName);
+            }
+
+            inventory.setQuantity(inventory.getQuantity() - quantityToDecrease);
+            return Mono.just(inventoryRepository.save(inventory));
+        }).subscribeOn(Schedulers.boundedElastic());
+    }
 
 }

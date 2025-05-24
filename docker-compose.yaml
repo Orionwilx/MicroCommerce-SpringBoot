@@ -134,7 +134,7 @@ services:
       context: ./api-gateway
       dockerfile: Dockerfile
     ports:
-      - "8090:8090"
+      - "8092-8093:8090"
     environment:
       - SERVER_PORT=8090
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/

@@ -1,5 +1,7 @@
 package com.unimagdalena.inventoryservice.controller;
 
+import com.unimagdalena.inventoryservice.dto.InventoryUpdateRequest;
+import com.unimagdalena.inventoryservice.dto.InventoryCreateRequest;
 import com.unimagdalena.inventoryservice.entity.Inventory;
 import com.unimagdalena.inventoryservice.service.InventoryService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
@@ -37,7 +39,11 @@ public class InventoryController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Mono<Inventory> createInventoryItem(@RequestBody Inventory inventory) {
+    public Mono<Inventory> createInventoryItem(@RequestBody InventoryCreateRequest request) {
+        Inventory inventory = new Inventory();
+        inventory.setId(request.getProductId());
+        inventory.setProductName(request.getProductName());
+        inventory.setQuantity(request.getQuantity());
         return inventoryService.createInventoryItem(inventory);
     }
 
@@ -52,6 +58,18 @@ public class InventoryController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public Mono<Void> deleteInventoryItem(@PathVariable String id) {
         return inventoryService.deleteInventoryItem(id);
+    }
+
+    @GetMapping("/product/{productName}")
+    public Mono<ResponseEntity<Inventory>> getInventoryByProductName(@PathVariable String productName) {
+        return inventoryService.getInventoryByProductName(productName)
+                .map(ResponseEntity::ok)
+                .defaultIfEmpty(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping("/product/update")
+    public Mono<Inventory> updateInventoryQuantity(@RequestBody InventoryUpdateRequest request) {
+        return inventoryService.decreaseInventory(request.getProductName(), request.getQuantityToDecrease());
     }
 
     String fallback(String id, Throwable t) {
