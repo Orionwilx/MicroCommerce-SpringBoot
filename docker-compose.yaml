@@ -17,7 +17,7 @@ services:
     networks:
       - microservices-network
     deploy:
-      replicas: 3
+      replicas: 1
 
   order-db:
     image: postgres:15-alpine
@@ -46,7 +46,7 @@ services:
     networks:
       - microservices-network
     deploy:
-      replicas: 3
+      replicas: 1
 
   product-db:
     image: mongo:6.0
@@ -72,7 +72,7 @@ services:
     networks:
       - microservices-network
     deploy:
-      replicas: 3
+      replicas: 1
 
   inventory-db:
     image: postgres:15-alpine
@@ -103,7 +103,7 @@ services:
     networks:
       - microservices-network
     deploy:
-      replicas: 3
+      replicas: 1
 
   payment-db:
     image: postgres:15-alpine
@@ -134,7 +134,7 @@ services:
       context: ./api-gateway
       dockerfile: Dockerfile
     ports:
-      - "8090"
+      - "8092-8093:8090"
     environment:
       - SERVER_PORT=8090
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
@@ -147,7 +147,7 @@ services:
     networks:
       - microservices-network
     deploy:
-      replicas: 2
+      replicas: 1
 
 networks:
   microservices-network:

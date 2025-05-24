@@ -1,5 +1,6 @@
 package com.unimagdalena.inventoryservice.controller;
 
+import com.unimagdalena.inventoryservice.dto.InventoryUpdateRequest;
 import com.unimagdalena.inventoryservice.entity.Inventory;
 import com.unimagdalena.inventoryservice.service.InventoryService;
 import org.junit.jupiter.api.Test;
@@ -177,5 +178,31 @@ public class InventoryControllerTest {
         webTestClient.delete().uri("/api/inventory/{id}", id)
                 .exchange()
                 .expectStatus().isNoContent();
+    }
+
+    {
+        // given
+        String productName = "Test Product";
+        InventoryUpdateRequest request = new InventoryUpdateRequest();
+        request.setProductName(productName);
+        request.setQuantityToDecrease(5);
+
+        Inventory updatedInventory = Inventory.builder()
+                .id(UUID.randomUUID().toString())
+                .productName(productName)
+                .quantity(10) // Cantidad después de la actualización
+                .build();
+
+        when(inventoryService.decreaseInventory(productName, 5))
+                .thenReturn(Mono.just(updatedInventory));
+
+        // when & then
+        webTestClient.post().uri("/api/inventory/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(request)
+                .exchange()
+                .expectStatus().isOk()
+                .expectBody(Inventory.class)
+                .isEqualTo(updatedInventory);
     }
 }
