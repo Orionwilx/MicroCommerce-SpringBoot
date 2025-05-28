@@ -17,11 +17,14 @@ import java.math.BigDecimal;
 public class ProductController {
 
 
+    final CircuitBreaker circuitBreaker;
+
     private final ProductService productService;
 
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CircuitBreaker registry) {
 
         this.productService = productService;
+        circuitBreaker = registry.circuitBreaker("createProducToInventory");
     }
 
 
