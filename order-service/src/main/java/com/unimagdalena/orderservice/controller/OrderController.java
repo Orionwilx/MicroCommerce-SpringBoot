@@ -2,12 +2,17 @@ package com.unimagdalena.orderservice.controller;
 
 import com.unimagdalena.orderservice.entity.Order;
 import com.unimagdalena.orderservice.service.OrderService;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
 
 @RestController
 @RequestMapping("/api/orders")
@@ -30,6 +35,7 @@ public class OrderController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @CircuitBreaker(name = "createOrderToInvetory", fallbackMethod = "fallbackCreateOrderToInvetory")
     public Mono<Order> createOrder(@RequestBody Order order) {
         return orderService.createOrder(order);
     }
@@ -44,4 +50,15 @@ public class OrderController {
     public Mono<Void> deleteOrder(@PathVariable String id){
         return orderService.deleteOrder(id);
     }
+
+
+
+    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
+    public Mono<Order> fallbackCreateOrderToInvetory(Order order) {
+        Order error = new Order("503","en la comunicacion con el microservicio Inventario",503, new BigDecimal("503"), LocalDateTime.now());
+
+        return Mono.just(error).subscribeOn(Schedulers.boundedElastic());
+    }
+
+
 }
