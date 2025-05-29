@@ -1,7 +1,7 @@
 # E-Commerce Microservices System
 
 ## Description
-E-commerce system based on microservices architecture built with Spring Boot. This architecture enables scalability, resilience, and independent development of each component.
+E-commerce system based on microservices architecture built with Spring Boot. This architecture enables scalability, resilience, independent development, and now includes observability and monitoring with Prometheus and Grafana.
 
 ## Architecture
 
@@ -9,11 +9,13 @@ E-commerce system based on microservices architecture built with Spring Boot. Th
 
 ### Implemented Services:
 - **Product Service**: Manages product catalog (MongoDB)
-- **Order Service**: Handles orders and checkout
-- **Inventory Service**: Stock control
+- **Order Service**: Handles orders and checkout (PostgreSQL)
+- **Inventory Service**: Stock control (PostgreSQL)
 - **Payment Service**: Payment processing (PostgreSQL)
 - **Eureka Server**: Service discovery for registering and locating microservices
 - **API Gateway**: Single entry point for all client requests
+- **Prometheus**: Monitoring and metrics collection
+- **Grafana**: Visualization of metrics and dashboards
 
 ## Technologies Used
 - **Spring Boot**: Main development framework
@@ -23,6 +25,8 @@ E-commerce system based on microservices architecture built with Spring Boot. Th
 - **PostgreSQL & MongoDB**: SQL and NoSQL databases
 - **Eureka**: Service registration and discovery
 - **Spring Cloud Gateway**: API Gateway for centralized routing
+- **Spring Actuator**: Exposes operational endpoints for monitoring
+- **Prometheus & Grafana**: Monitoring and visualization
 - **Maven**: Dependency management and build
 - **JUnit & Mockito**: Unit and integration testing
 
@@ -34,6 +38,8 @@ E-commerce system based on microservices architecture built with Spring Boot. Th
 - Polyglot persistence (SQL and NoSQL)
 - Service discovery with Eureka
 - Centralized routing with API Gateway
+- Observability and monitoring with Prometheus & Grafana
+- Metrics exposure with Spring Actuator
 - Unit and integration tests
 
 ## Setup and Deployment
@@ -47,6 +53,12 @@ git clone https://github.com/username/ecommerce-microservices.git
 # Deploy with Docker Compose
 docker-compose up -d
 ```
+
+## Monitoring & Observability
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3000 (default user: admin, password: admin)
+- **Spring Actuator Prometheus Endpoint**: `/actuator/prometheus` en cada microservicio
+- **Prometheus config**: Ver `prometheus.yml` para los targets de scraping
 
 ## Main API Endpoints
 All endpoints are available through the API Gateway at: `http://localhost:8090`
@@ -84,28 +96,32 @@ DELETE /api/inventory/{id}    - Delete inventory product
 ## Infrastructure Services
 - **Eureka Server**: http://localhost:8761
 - **API Gateway**: http://localhost:8090
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3000
 
 ## Challenges Overcome
 - Integration of reactive programming with relational databases
 - Docker container network configuration
 - Implementation of resilience patterns
 - Configuration of multiple service replicas with Docker Compose
+- Centralized monitoring and observability
 
 ## Recommendations for Project Enhancement
 - ~~Implement API Gateway (Spring Cloud Gateway)~~
 - ~~Add service discovery (Eureka)~~
+- ~~Expose metrics with Spring Actuator~~
+- ~~Integrate Prometheus and Grafana for monitoring~~
 - Implement Circuit Breaker with Resilience4j
 - Add authentication/authorization with OAuth2/JWT
 - ~~Implement unit and integration tests~~
 - Incorporate API documentation with Swagger/OpenAPI
-- Configure monitoring with Spring Actuator and Prometheus
 
 # **_Spanish Version_**
 
 # Microservicio de Comercio Electrónico
 
 ## Descripción
-Sistema de comercio electrónico basado en microservicios construido con Spring Boot. Esta arquitectura permite escalabilidad, resilencia y desarrollo independiente de cada componente.
+Sistema de comercio electrónico basado en microservicios construido con Spring Boot. Esta arquitectura permite escalabilidad, resiliencia, desarrollo independiente y ahora incluye observabilidad y monitoreo con Prometheus y Grafana.
 
 ## Arquitectura
 
@@ -113,11 +129,13 @@ Sistema de comercio electrónico basado en microservicios construido con Spring 
 
 ### Servicios implementados:
 - **Product Service**: Gestiona el catálogo de productos (MongoDB)
-- **Order Service**: Maneja pedidos y checkout
-- **Inventory Service**: Control de stock
+- **Order Service**: Maneja pedidos y checkout (PostgreSQL)
+- **Inventory Service**: Control de stock (PostgreSQL)
 - **Payment Service**: Procesamiento de pagos (PostgreSQL)
 - **Eureka Server**: Servicio de descubrimiento que registra y localiza microservicios
 - **API Gateway**: Punto único de entrada para todas las solicitudes de clientes
+- **Prometheus**: Monitoreo y recolección de métricas
+- **Grafana**: Visualización de métricas y dashboards
 
 ## Tecnologías utilizadas
 - **Spring Boot**: Framework principal de desarrollo
@@ -127,6 +145,8 @@ Sistema de comercio electrónico basado en microservicios construido con Spring 
 - **PostgreSQL y MongoDB**: Bases de datos SQL y NoSQL
 - **Eureka**: Registro y descubrimiento de servicios
 - **Spring Cloud Gateway**: API Gateway para enrutamiento centralizado
+- **Spring Actuator**: Exposición de endpoints operativos para monitoreo
+- **Prometheus y Grafana**: Monitoreo y visualización
 - **Maven**: Gestión de dependencias y build
 - **JUnit & Mockito**: Pruebas unitarias y de integración
 
@@ -135,9 +155,11 @@ Sistema de comercio electrónico basado en microservicios construido con Spring 
 - Programación reactiva con WebFlux
 - APIs RESTful
 - Contenerización con Docker
-- Persistencia polglota (SQL y NoSQL)
+- Persistencia poliglota (SQL y NoSQL)
 - Descubrimiento de servicios con Eureka
 - Enrutamiento centralizado con API Gateway
+- Observabilidad y monitoreo con Prometheus y Grafana
+- Exposición de métricas con Spring Actuator
 - Tests unitarios y de integración
 
 ## Configuración y despliegue
@@ -151,6 +173,12 @@ git clone https://github.com/usuario/ecommerce-microservices.git
 # Desplegar con Docker Compose
 docker-compose up -d
 ```
+
+## Monitoreo y Observabilidad
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3000 (usuario: admin, contraseña: admin)
+- **Endpoint Prometheus de Spring Actuator**: `/actuator/prometheus` en cada microservicio
+- **Configuración de Prometheus**: Ver `prometheus.yml` para los targets de scraping
 
 ## Endpoints API principales
 Todos los endpoints están disponibles a través del API Gateway en: `http://localhost:8090`
@@ -183,29 +211,31 @@ POST   /api/inventory         - Crear nuevo producto en inventario
 GET    /api/inventory/{id}    - Ver detalle de producto en inventario
 PUT    /api/inventory/{id}    - Actualizar producto en inventario
 DELETE /api/inventory/{id}    - Eliminar producto en inventario
-
 ```
-
 
 ## Servicios de infraestructura
 - **Eureka Server**: http://localhost:8761
 - **API Gateway**: http://localhost:8090
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3000
 
 ## Desafíos superados
 - Integración de programación reactiva con bases de datos relacionales
 - Configuración de redes entre contenedores Docker
-- Implementación de patrones de resilencia
+- Implementación de patrones de resiliencia
 - Configuración de múltiples réplicas de servicios mediante Docker Compose
+- Monitoreo y observabilidad centralizados
 
 ## Recomendaciones para mejorar el proyecto
 - ~~Implementar un API Gateway (Spring Cloud Gateway)~~
 - ~~Agregar servicio de descubrimiento (Eureka)~~
+- ~~Exponer métricas con Spring Actuator~~
+- ~~Integrar Prometheus y Grafana para monitoreo~~
 - Implementar Circuit Breaker con Resilience4j
 - Añadir autenticación/autorización con OAuth2/JWT
 - ~~Implementar tests unitarios e integración~~
 - Incorporar documentación de API con Swagger/OpenAPI
-- Configurar monitoreo con Spring Actuator y Prometheus
 
 ## Pendientes 
- - Terminar integracion correcta de circuit breaker con resilience4j
+ - Terminar integración correcta de circuit breaker con resilience4j
  - Agregar observabilidad con spring actuator
