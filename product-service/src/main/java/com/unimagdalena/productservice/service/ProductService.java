@@ -9,6 +9,7 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Service
@@ -32,7 +33,12 @@ public class ProductService {
                 .subscribeOn(Schedulers.boundedElastic());
     }
 
+
     public Mono<Product> createProduct(Product product) {
+        if (product.getName() == null || product.getName().isEmpty()) {
+            return Mono.error(new IllegalArgumentException("Product name cannot be empty"));
+        }
+
         product.setId(UUID.randomUUID().toString());
         return Mono.defer(() -> Mono.just(productRepository.save(product)))
                 .subscribeOn(Schedulers.boundedElastic())
@@ -47,6 +53,12 @@ public class ProductService {
                         .bodyValue(request)
                         .retrieve()
                         .bodyToMono(Void.class)
+                        .onErrorResume(ex -> {
+                            // Opcional: Loggear el error para debugging
+                            System.err.println("Error calling inventory service for product " + savedProduct.getId() + ": " + ex.getMessage());
+                            // Propaga un error que el Circuit Breaker pueda detectar
+                            return Mono.error(new RuntimeException("Failed to update inventory for product: " + savedProduct.getId(), ex));
+                        })
                         .thenReturn(savedProduct);
                 });
     }
@@ -67,4 +79,6 @@ public class ProductService {
             return Mono.empty();
         }).subscribeOn(Schedulers.boundedElastic()).then();
     }
+
+
 }

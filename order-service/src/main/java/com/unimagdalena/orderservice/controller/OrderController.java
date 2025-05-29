@@ -34,8 +34,8 @@ public class OrderController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = "createOrderToInvetory", fallbackMethod = "fallbackCreateOrderToInvetory")
+    @ResponseStatus(HttpStatus.CREATED)
     public Mono<Order> createOrder(@RequestBody Order order) {
         return orderService.createOrder(order);
     }

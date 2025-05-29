@@ -3,7 +3,6 @@ package com.unimagdalena.productservice.controller;
 import com.unimagdalena.productservice.entity.Product;
 import com.unimagdalena.productservice.service.ProductService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -17,14 +16,11 @@ import java.math.BigDecimal;
 public class ProductController {
 
 
-    final CircuitBreaker circuitBreaker;
-
     private final ProductService productService;
 
-    public ProductController(ProductService productService, CircuitBreaker registry) {
+    public ProductController(ProductService productService) {
 
         this.productService = productService;
-        circuitBreaker = registry.circuitBreaker("createProducToInventory");
     }
 
 
@@ -39,13 +35,9 @@ public class ProductController {
     }
 
     @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
     @CircuitBreaker(name = "createProducToInventory" , fallbackMethod = "fallbackCreateProduct")
+    @ResponseStatus(HttpStatus.CREATED)
     public Mono<Product> createProduct(@RequestBody Product product) {
-        if (product.getName().equals("999")) {
-            throw new IllegalArgumentException("Simulated failure for name: " + product.getName());
-
-        }
         return productService.createProduct(product);
     }
 
@@ -61,13 +53,13 @@ public class ProductController {
     }
 
 
-    @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public Mono<Product> fallbackCreateProduct(Product product) {
+    private Mono<Product> fallbackCreateProduct(Product product) {
 
         Product error = new Product("503","Servicio no disponible",new BigDecimal("503.0"),"");
 
         return Mono.defer(() -> Mono.justOrEmpty(error))
                 .subscribeOn(Schedulers.boundedElastic());
     }
+
 
 }
