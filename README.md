@@ -60,6 +60,28 @@ docker-compose up -d
 - **Spring Actuator Prometheus Endpoint**: `/actuator/prometheus` en cada microservicio
 - **Prometheus config**: Ver `prometheus.yml` para los targets de scraping
 
+## Centralized Logs and Observability
+The system now includes:
+- **Loki**: stores and centralizes logs from all microservices.
+- **Promtail**: collects logs from Docker containers and sends them to Loki.
+- **Grafana**: allows you to visualize and query logs stored in Loki, alongside Prometheus metrics.
+
+### How does it work?
+- Each Docker container generates logs in local files.
+- Promtail reads these files and sends them to Loki.
+- Loki stores the logs and Grafana visualizes them, enabling advanced searches and correlation with metrics.
+
+### Quick Access
+- **Loki**: http://localhost:3100 (API)
+- **Grafana**: http://localhost:3000 ("Explore" section for logs)
+
+### Example query in Grafana
+Go to Grafana → Explore → select the Loki data source and run:
+```
+{job="docker"}
+```
+This will show logs from all Docker containers.
+
 ## Main API Endpoints
 All endpoints are available through the API Gateway at: `http://localhost:8090`
 
@@ -179,6 +201,28 @@ docker-compose up -d
 - **Grafana**: http://localhost:3000 (usuario: admin, contraseña: admin)
 - **Endpoint Prometheus de Spring Actuator**: `/actuator/prometheus` en cada microservicio
 - **Configuración de Prometheus**: Ver `prometheus.yml` para los targets de scraping
+
+## Logs centralizados y observabilidad
+Ahora el sistema cuenta con:
+- **Loki**: almacena y centraliza los logs de todos los microservicios.
+- **Promtail**: recolecta los logs de los contenedores Docker y los envía a Loki.
+- **Grafana**: permite visualizar y consultar los logs almacenados en Loki, junto con las métricas de Prometheus.
+
+### ¿Cómo funciona?
+- Cada contenedor Docker genera logs en archivos locales.
+- Promtail lee estos archivos y los envía a Loki.
+- Loki almacena los logs y Grafana los visualiza, permitiendo búsquedas avanzadas y correlación con métricas.
+
+### Acceso rápido
+- **Loki**: http://localhost:3100 (API)
+- **Grafana**: http://localhost:3000 (sección "Explore" para logs)
+
+### Ejemplo de consulta en Grafana
+Entra a Grafana → Explore → selecciona la fuente Loki y consulta:
+```
+{job="docker"}
+```
+Esto mostrará los logs de todos los contenedores Docker.
 
 ## Endpoints API principales
 Todos los endpoints están disponibles a través del API Gateway en: `http://localhost:8090`
