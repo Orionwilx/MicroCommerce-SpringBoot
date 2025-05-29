@@ -1,5 +1,6 @@
+version: '3.9'
+
 services:
-  # ORDER MICROSERVICE
   order-service:
     build:
       context: ./order-service
@@ -32,12 +33,11 @@ services:
     networks:
       - microservices-network
 
-  # PRODUCT MICROSERVICE
   product-service:
     build: ./product-service
     ports:
-      - "8081" #Debe exponerse tanto internamente como para el cliente en otro puerto supone que es porque utiliza una base de datos no relacional
-    environment:    #Pero no sabe si esa es la razon  ya que de esta forma fue que funciono
+      - "8081"
+    environment:
       - SPRING_DATA_MONGODB_URI=mongodb://product-db:27017/productdb
       - SERVER_PORT=8081
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
@@ -56,7 +56,7 @@ services:
       - product-data:/data/db
     networks:
       - microservices-network
-  # INVENTORY MICROSERVICE
+
   inventory-service:
     build: ./inventory-service
     ports:
@@ -87,7 +87,6 @@ services:
     networks:
       - microservices-network
 
-  # PAYMENT MICROSERVICE
   payment-service:
     build: ./payment-service
     ports:
@@ -117,7 +116,7 @@ services:
       - payment-data:/var/lib/postgresql/data
     networks:
       - microservices-network
-  # EUREKA SERVER
+
   eureka-server:
     build:
       context: ./eureka-server
@@ -128,7 +127,6 @@ services:
     networks:
       - microservices-network
 
-  # API GATEWAY
   api-gateway:
     build:
       context: ./api-gateway
@@ -149,13 +147,45 @@ services:
     deploy:
       replicas: 1
 
-networks:
-  microservices-network:
-    driver: bridge
+  keycloak-db:
+    image: postgres:15-alpine
+    container_name: keycloak-db
+    environment:
+      - POSTGRES_DB=keycloak
+      - POSTGRES_USER=keycloak
+      - POSTGRES_PASSWORD=keycloak
+    volumes:
+      - keycloak-data:/var/lib/postgresql/data
+    networks:
+      - microservices-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0.3
+    container_name: keycloak
+    command: start-dev
+    environment:
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://keycloak-db:5432/keycloak
+      - KC_DB_USERNAME=keycloak
+      - KC_DB_PASSWORD=keycloak
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+    ports:
+      - "8084:8080"
+    depends_on:
+      - keycloak-db
+    volumes:
+      - ./keycloak-realm-export:/opt/keycloak/data/import
+    networks:
+      - microservices-network
 
 volumes:
   order-data:
   product-data:
   inventory-data:
   payment-data:
+  keycloak-data:
 
+networks:
+  microservices-network:
+    driver: bridge
