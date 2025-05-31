@@ -1,5 +1,3 @@
-version: '3.9'
-
 services:
   order-service:
     build:
@@ -13,6 +11,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SERVER_PORT=8080
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - management.endpoints.web.exposure.include=health,info,prometheus
+      - management.endpoint.prometheus.enabled=true
     depends_on:
       - order-db
     networks:
@@ -41,6 +41,8 @@ services:
       - SPRING_DATA_MONGODB_URI=mongodb://product-db:27017/productdb
       - SERVER_PORT=8081
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - management.endpoints.web.exposure.include=health,info,prometheus
+      - management.endpoint.prometheus.enabled=true
     depends_on:
       - product-db
     networks:
@@ -67,6 +69,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SERVER_PORT=8082
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - management.endpoints.web.exposure.include=health,info,prometheus
+      - management.endpoint.prometheus.enabled=true
     depends_on:
       - inventory-db
     networks:
@@ -97,6 +101,8 @@ services:
       - SPRING_DATASOURCE_PASSWORD=postgres
       - SERVER_PORT=8083
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - management.endpoints.web.exposure.include=health,info,prometheus
+      - management.endpoint.prometheus.enabled=true
     depends_on:
       - payment-db
     networks:
@@ -136,6 +142,8 @@ services:
     environment:
       - SERVER_PORT=8090
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-server:8761/eureka/
+      - management.endpoints.web.exposure.include=health,info,prometheus
+      - management.endpoint.prometheus.enabled=true
     depends_on:
       - eureka-server
       - order-service
@@ -147,6 +155,48 @@ services:
     deploy:
       replicas: 1
 
+  # PROMETHEUS
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - microservices-network
+
+  # GRAFANA
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    networks:
+      - microservices-network
+    depends_on:
+      - prometheus
+
+  # LOKI
+  loki:
+    image: grafana/loki:2.9.4
+    ports:
+      - "3100:3100"
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - microservices-network
+
+  # PROMTAIL
+  promtail:
+    image: grafana/promtail:2.9.4
+    volumes:
+      - ./promtail-config.yml:/etc/promtail/config.yml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/log:/var/log:ro
+    command: -config.file=/etc/promtail/config.yml
+    depends_on:
+      - loki
+    networks:
+      - microservices-network
+    
   keycloak-db:
     image: postgres:15-alpine
     container_name: keycloak-db
