@@ -12,12 +12,56 @@ scrape_configs:
           - localhost
         labels:
           job: varlogs
+          env: prod
+          host: "{{ .Env.HOSTNAME }}"
           __path__: /var/log/*log
-  - job_name: docker
+  - job_name: docker-order-service
     static_configs:
       - targets:
           - localhost
         labels:
           job: docker
+          env: prod
+          app: order-service
+          host: "{{ .Env.HOSTNAME }}"
           __path__: /var/lib/docker/containers/*/*.log
-
+  - job_name: docker-product-service
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          env: prod
+          app: product-service
+          host: "{{ .Env.HOSTNAME }}"
+          __path__: /var/lib/docker/containers/*/*.log
+  - job_name: docker-inventory-service
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          env: prod
+          app: inventory-service
+          host: "{{ .Env.HOSTNAME }}"
+          __path__: /var/lib/docker/containers/*/*.log
+  - job_name: docker-payment-service
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          env: prod
+          app: payment-service
+          host: "{{ .Env.HOSTNAME }}"
+          __path__: /var/lib/docker/containers/*/*.log
+  - job_name: docker-api-gateway
+    static_configs:
+      - targets:
+          - localhost
+        labels:
+          job: docker
+          env: prod
+          app: api-gateway
+          host: "{{ .Env.HOSTNAME }}"
+          __path__: /var/lib/docker/containers/*/*.log
