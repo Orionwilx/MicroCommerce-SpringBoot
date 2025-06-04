@@ -99,7 +99,11 @@ public class RouteConfig {
                                 )
                         )
                         .uri("lb://payment-service"))
-
+                //RUTA KEYCLOAK
+                .route("keycloak-token", r -> r
+                        .path("/auth")
+                        .filters(f -> f.setPath("/realms/master/protocol/openid-connect/token"))
+                        .uri("http://keycloak:8080"))
 
                 //APARTIR DE AQUI ESTAN LAS RUTAS PARA EL FUNCIONAMIENTO DEL CIRCUIT-BREAKER
 
@@ -138,9 +142,8 @@ public class RouteConfig {
                         )
                         .uri("forward:/fallback-response/payments-unavailable")
                 )
-
                 .build();
 
-    }
 
+    }
 }
