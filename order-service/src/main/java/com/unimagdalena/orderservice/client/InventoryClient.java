@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 @FeignClient(name = "inventory-service", path = "/api/inventory")
 public interface InventoryClient {
 
-    @GetMapping("/{productName}")
+    @GetMapping("/product/{productName}")
     InventoryResponse getInventoryByProductName(@PathVariable String productName);
 
     @PostMapping("/product/update")

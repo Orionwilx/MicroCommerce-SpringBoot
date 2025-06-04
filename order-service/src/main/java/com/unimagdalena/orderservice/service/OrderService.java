@@ -12,6 +12,7 @@ import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
 
 import java.util.NoSuchElementException;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -30,23 +31,22 @@ public class OrderService {
     }
 
     public Mono<Order> createOrder(Order order){
+        log.info("Entro a crear la orden");
         return Mono.defer(() -> {
-                    try {
-                        // Luego actualizamos el inventario
-                        InventoryUpdateRequest updateRequest = new InventoryUpdateRequest();
-                        updateRequest.setId(order.getId());
-                        updateRequest.setProductName(order.getProductName());
-                        updateRequest.setQuantityToDecrease(order.getQuantity());
+                    // Luego actualizamos el inventario
+                    InventoryUpdateRequest updateRequest = new InventoryUpdateRequest();
+                    updateRequest.setProductName(order.getProductName());
+                    updateRequest.setQuantityToDecrease(order.getQuantity());
+                    log.info("Inventario va a ser actualizado");
+                    inventoryClient.updateInventory(updateRequest);
+                    log.info("Inventario actualizado correctamente para el producto: {}", order.getProductName());
 
-                        inventoryClient.updateInventory(updateRequest);
-                        log.info("Inventario actualizado correctamente para el producto: {}", order.getProductName());
-                    } catch (Exception e) {
-                        log.error("Error al actualizar el inventario: {}", e.getMessage());
-                        // Aquí podrías implementar un mecanismo de compensación o registrar el error
-                    }
                     // Primero guardamos la orden
+                    log.info("Guardando order");
+                    if (order.getId() == null || order.getId().isEmpty()) {
+                        order.setId(UUID.randomUUID().toString());
+                    }
                     Order savedOrder = orderRepository.save(order);
-
                     return Mono.just(savedOrder);
                 })
                 .subscribeOn(Schedulers.boundedElastic());

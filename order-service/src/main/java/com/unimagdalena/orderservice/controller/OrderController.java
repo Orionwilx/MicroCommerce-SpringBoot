@@ -4,9 +4,11 @@ import com.unimagdalena.orderservice.entity.Order;
 import com.unimagdalena.orderservice.service.OrderService;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -17,6 +19,7 @@ import java.time.LocalDateTime;
 @RestController
 @RequestMapping("/api/orders")
 @RequiredArgsConstructor
+@Slf4j
 public class OrderController {
 
     private final OrderService orderService;
@@ -37,6 +40,7 @@ public class OrderController {
     @CircuitBreaker(name = "createOrderToInvetory", fallbackMethod = "fallbackCreateOrderToInvetory")
     @ResponseStatus(HttpStatus.CREATED)
     public Mono<Order> createOrder(@RequestBody Order order) {
+
         return orderService.createOrder(order);
     }
 
@@ -52,12 +56,18 @@ public class OrderController {
     }
 
 
-
     @ResponseStatus(HttpStatus.SERVICE_UNAVAILABLE)
-    public Mono<Order> fallbackCreateOrderToInvetory(Order order) {
-        Order error = new Order("503","en la comunicacion con el microservicio Inventario",503, new BigDecimal("503"), LocalDateTime.now());
+    public Mono<Order> fallbackCreateOrderToInvetory(Order order, Exception ex) {
 
-        return Mono.just(error).subscribeOn(Schedulers.boundedElastic());
+        String errorMessage = ex != null ? ex.getMessage() : "Error desconocido";
+        log.warn("Circuit breaker activated for createOrderToInvetory. Error: {}", errorMessage);
+
+        // Crear una orden con estado degradado
+        Order fallbackOrder = new Order();
+        fallbackOrder.setId("PENDING_INVENTORY_UPDATE");
+        fallbackOrder.setProductName("Servicio de inventario no disponible, intente mas tarde.");
+
+        return Mono.just(fallbackOrder);
     }
 
 

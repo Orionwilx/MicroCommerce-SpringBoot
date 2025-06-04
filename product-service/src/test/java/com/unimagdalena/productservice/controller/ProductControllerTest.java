@@ -1,5 +1,6 @@
 package com.unimagdalena.productservice.controller;
 
+import com.unimagdalena.productservice.dto.ProductResponse;
 import com.unimagdalena.productservice.entity.Product;
 import com.unimagdalena.productservice.service.ProductService;
 import org.junit.jupiter.api.Test;
@@ -37,7 +38,7 @@ public class ProductControllerTest {
         request.setDescription("Test Description");
         request.setPrice(new BigDecimal("100.0"));
 
-        Product response = new Product();
+        ProductResponse response = new ProductResponse();
         response.setId(uuid);
         response.setName("Test Product");
         response.setDescription("Test Description");

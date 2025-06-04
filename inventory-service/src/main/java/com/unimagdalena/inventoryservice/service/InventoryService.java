@@ -3,6 +3,7 @@ package com.unimagdalena.inventoryservice.service;
 import com.unimagdalena.inventoryservice.entity.Inventory;
 import com.unimagdalena.inventoryservice.repository.InventoryRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -12,6 +13,7 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class InventoryService {
 
     private final InventoryRepository inventoryRepository;
